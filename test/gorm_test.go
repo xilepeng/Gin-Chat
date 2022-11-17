@@ -18,7 +18,10 @@ func TestGorm(t *testing.T) {
 	}
 
 	// Auto Migrate
-	db.AutoMigrate(&models.UserBasic{})
+	err = db.AutoMigrate(&models.UserBasic{})
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 	// Set table options
 	db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&models.UserBasic{})
 

@@ -1,0 +1,3 @@
+
+mysql:
+  dns: root:Yizhili80@tcp(127.0.0.1:3306)/Gin-Chat?charset=utf8mb4&parseTime=True&loc=Local

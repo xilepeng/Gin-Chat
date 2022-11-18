@@ -1,7 +1,18 @@
 package main
 
-import "fmt"
+import (
+	"Gin-Chat/router"
+	"Gin-Chat/utils"
+)
 
 func main() {
-	fmt.Println("hello")
+
+	utils.InitConfig()
+	utils.InitMySQL()
+
+	r := router.Router()
+	err := r.Run()
+	if err != nil {
+		return
+	}
 }

@@ -2,6 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"gorm.io/gorm/logger"
+	"log"
+	"os"
+	"time"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -20,13 +24,22 @@ func InitConfig() {
 	// fmt.Println("MySQL config: ", viper.Get("mysql"))
 	//fmt.Println("app config: ", viper.Get("app"))
 
-	fmt.Println("config app inited")
+	fmt.Println("config app init")
 }
 
 var DB *gorm.DB
 
 func InitMySQL() {
-	DB, _ = gorm.Open(mysql.Open(viper.GetString("mysql.dns")), &gorm.Config{})
+	// 自定义日志模版，打印SQL语句
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second, // 慢 SQL 阈值
+			LogLevel:      logger.Info, // 级别
+			Colorful:      true,
+		},
+	)
+	DB, _ = gorm.Open(mysql.Open(viper.GetString("mysql.dns")), &gorm.Config{Logger: newLogger})
 	fmt.Println("MySQL inited")
 
 	// 测试代码

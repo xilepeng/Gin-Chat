@@ -2,10 +2,11 @@ package utils
 
 import (
 	"fmt"
-	"gorm.io/gorm/logger"
 	"log"
 	"os"
 	"time"
+
+	"gorm.io/gorm/logger"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"

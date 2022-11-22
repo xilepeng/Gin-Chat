@@ -19,3 +19,8 @@ swagger 接口访问地址：
 ``` shell
 http://localhost:8080/swagger/index.html
 ```
+
+电话、邮箱校验
+``` shell
+go get github.com/asaskevich/govalidator
+```

@@ -8,6 +8,7 @@ paths:
           description: OK
           schema:
             type: string
+      summary: 网站首页
       tags:
       - 首页
   /user/createUser:
@@ -25,12 +26,35 @@ paths:
         in: query
         name: repassWord
         type: string
+      - description: phone
+        in: query
+        name: phone
+        type: string
+      - description: email
+        in: query
+        name: email
+        type: string
       responses:
         "200":
           description: OK
           schema:
             type: string
-      summary: 新增用户
+      summary: 创建用户
+      tags:
+      - 用户模块
+  /user/deleteUser:
+    delete:
+      parameters:
+      - description: id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: 删除用户
       tags:
       - 用户模块
   /user/getUserList:
@@ -40,7 +64,38 @@ paths:
           description: OK
           schema:
             type: string
-      summary: 所有用户
+      summary: 获取所有用户
       tags:
-      - 获取用户列表
+      - 用户模块
+  /user/updateUser:
+    put:
+      parameters:
+      - description: id
+        in: formData
+        name: id
+        type: string
+      - description: name
+        in: formData
+        name: name
+        type: string
+      - description: password
+        in: formData
+        name: password
+        type: string
+      - description: phone
+        in: formData
+        name: phone
+        type: string
+      - description: email
+        in: formData
+        name: email
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: 修改用户
+      tags:
+      - 用户模块
 swagger: "2.0"

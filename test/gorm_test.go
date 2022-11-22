@@ -3,10 +3,11 @@ package test
 import (
 	"Gin-Chat/models"
 	"fmt"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"log"
 	"testing"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func TestGorm(t *testing.T) {

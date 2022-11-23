@@ -12,10 +12,13 @@ import (
 func Router() *gin.Engine {
 	r := gin.Default()
 	docs.SwaggerInfo.BasePath = "" // alt + shift + enter 选择包导入
-
+	// swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-
+	// 首页
 	r.GET("/index", service.GetIndex)
+
+	// 用户模块
+	r.POST("/user/login", service.Login) // 登录
 
 	r.POST("/user/createUser", service.CreateUser)   // 增
 	r.DELETE("/user/deleteUser", service.DeleteUser) // 删

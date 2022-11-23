@@ -71,5 +71,7 @@ func FindUserByEmail(email string) UserBasic {
 func Login(name, password string) UserBasic {
 	user := UserBasic{}
 	utils.DB.Where("name = ? and pass_word = ?", name, password).First(&user)
+	// token 加密
+
 	return user
 }

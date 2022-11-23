@@ -34,7 +34,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 	salt := fmt.Sprintf("%06d", rand.Int31())
-
+	user.Salt = salt
 	password := c.Query("password")
 	repassWord := c.Query("repassWord")
 	if password != repassWord {
@@ -132,16 +132,41 @@ func GetUserList(c *gin.Context) {
 // @Summary 登录
 // @param name query string false "用户名"
 // @param password query string false "密码"
-// @Success 200 {string} data
-// @Router /user/Login [get]
+// @Success 200 {string} json{"code","message"}
+// @Router /user/login [post]
 func Login(c *gin.Context) {
-	user := models.UserBasic{}
+	data := models.UserBasic{}
 	name := c.Query("name")
+	user := models.FindUserByName(name)
+	if user.Name == "" {
+		c.JSON(-1, gin.H{
+			"message": "该用户尚未注册！",
+		})
+		return
+	}
+
 	password := c.Query("password")
-	if user.Identity == "" {
+	if user.Name == "" {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "该用户不存在！",
 		})
+		return
 	}
+	pwd := utils.MakePassword(password, user.Salt)
+
+	flag := utils.ValidPassword(password, user.Salt, pwd)
+	if !flag {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "密码不正确！",
+		})
+		return
+	}
+
+	data = models.Login(name, pwd) // pwd 加密后的密码
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"message": "登录成功！",
+		"data":    data,
+	})
 
 }

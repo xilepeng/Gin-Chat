@@ -2,7 +2,6 @@ package test
 
 import (
 	"Gin-Chat/models"
-	"fmt"
 	"log"
 	"testing"
 
@@ -27,11 +26,11 @@ func TestGorm(t *testing.T) {
 	db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&models.UserBasic{})
 
 	// 插入
-	user := &models.UserBasic{Name: "mojo"}
-	db.Create(user)
+	//user := &models.UserBasic{Name: "mojo", PassWord: "0000", Salt: "klsdj23r"}
+	//db.Create(user)
 
 	// 查询
-	fmt.Println(db.Find(&models.UserBasic{}, "id = ?", 0))
+	//fmt.Println(db.Find(&models.UserBasic{}, "id = ?", 0))
 
 	// 批量插入
 	//var users = []models.UserBasic{user}

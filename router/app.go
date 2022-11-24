@@ -25,5 +25,8 @@ func Router() *gin.Engine {
 	r.PUT("/user/updateUser", service.UpdateUser)    // 改
 	r.GET("/user/getUserList", service.GetUserList)  // 查
 
+	// 发送消息
+	r.GET("/user/sendMsg", service.SendMsg)
+
 	return r
 }

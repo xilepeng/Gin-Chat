@@ -3,6 +3,7 @@ package models
 import (
 	"Gin-Chat/utils"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -71,7 +72,11 @@ func FindUserByEmail(email string) UserBasic {
 func Login(name, password string) UserBasic {
 	user := UserBasic{}
 	utils.DB.Where("name = ? and pass_word = ?", name, password).First(&user)
+
 	// token 加密
+	str := fmt.Sprintf("%d", time.Now().Unix())
+	temp := utils.MD5Encode(str)
+	utils.DB.Model(&user).Where("id = ?", user.ID).Update("identity", temp)
 
 	return user
 }

@@ -24,3 +24,21 @@ http://localhost:8080/swagger/index.html
 ``` shell
 go get github.com/asaskevich/govalidator
 ```
+
+
+
+
+``` shell
+swag init && go run main.go   
+```
+
+
+
+```shell
+go get github.com/gorilla/websocket
+
+go get github.com/go-redis/redis/v9
+
+gorm.io/gorm
+
+```

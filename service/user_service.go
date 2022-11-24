@@ -4,11 +4,12 @@ import (
 	"Gin-Chat/models"
 	"Gin-Chat/utils"
 	"fmt"
+	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/websocket"
 	"math/rand"
 	"net/http"
 	"strconv"
-
-	"github.com/asaskevich/govalidator"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,7 +29,8 @@ func CreateUser(c *gin.Context) {
 	user.Name = c.Query("name")
 	u := models.FindUserByName(user.Name)
 	if u.Name != "" {
-		c.JSON(-1, gin.H{
+		c.JSON(http.StatusOK, gin.H{
+			"code":    -1,
 			"message": "该用户名已注册！",
 		})
 		return
@@ -38,7 +40,8 @@ func CreateUser(c *gin.Context) {
 	password := c.Query("password")
 	repassWord := c.Query("repassWord")
 	if password != repassWord {
-		c.JSON(-1, gin.H{
+		c.JSON(http.StatusOK, gin.H{
+			"code":    -1,
 			"message": "密码不一致！",
 		})
 		return
@@ -48,7 +51,8 @@ func CreateUser(c *gin.Context) {
 	user.Phone = c.Query("phone")
 	u = models.FindUserByPhone(user.Phone)
 	if u.Phone != "" {
-		c.JSON(-1, gin.H{
+		c.JSON(http.StatusOK, gin.H{
+			"code":    -1,
 			"message": "该手机号已注册！",
 		})
 		return
@@ -56,14 +60,18 @@ func CreateUser(c *gin.Context) {
 	user.Email = c.Query("email")
 	u = models.FindUserByEmail(user.Email)
 	if u.Email != "" {
-		c.JSON(-1, gin.H{
+		c.JSON(http.StatusOK, gin.H{
+			"code":    -1,
 			"message": "该邮箱已注册！",
 		})
 		return
 	}
 
 	models.CreateUser(user)
-	c.JSON(200, gin.H{"message": "创建用户成功！"})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"message": "创建用户成功！",
+	})
 }
 
 // DeleteUser
@@ -77,7 +85,10 @@ func DeleteUser(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Query("id"))
 	user.ID = uint(id)
 	models.DeleteUser(user)
-	c.JSON(200, gin.H{"message": "删除用户成功！"})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
+		"message": "删除用户成功！",
+	})
 }
 
 // UpdateUser
@@ -103,12 +114,16 @@ func UpdateUser(c *gin.Context) {
 	_, err := govalidator.ValidateStruct(user)
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(200, gin.H{
-			"msg": "修改参数不匹配",
+		c.JSON(http.StatusOK, gin.H{
+			"code":    -1,
+			"message": "修改参数不匹配",
 		})
 	} else {
 		models.UpdateUser(user)
-		c.JSON(200, gin.H{"message": "修改用户成功！"})
+		c.JSON(http.StatusOK, gin.H{
+			"code":    0,
+			"message": "修改用户成功！",
+		})
 	}
 
 }
@@ -122,8 +137,9 @@ func GetUserList(c *gin.Context) {
 	data := make([]*models.UserBasic, 10)
 	data = models.GetUserList()
 	c.JSON(http.StatusOK, gin.H{
-		"data":    data,
+		"code":    0,
 		"message": "查找用户成功！",
+		"data":    data,
 	})
 }
 
@@ -139,8 +155,10 @@ func Login(c *gin.Context) {
 	name := c.Query("name")
 	user := models.FindUserByName(name)
 	if user.Name == "" {
-		c.JSON(-1, gin.H{
+		c.JSON(http.StatusOK, gin.H{
+			"code":    -1,
 			"message": "该用户尚未注册！",
+			"data":    data,
 		})
 		return
 	}
@@ -148,7 +166,9 @@ func Login(c *gin.Context) {
 	password := c.Query("password")
 	if user.Name == "" {
 		c.JSON(http.StatusOK, gin.H{
+			"code":    -1,
 			"message": "该用户不存在！",
+			"data":    data,
 		})
 		return
 	}
@@ -157,7 +177,9 @@ func Login(c *gin.Context) {
 	flag := utils.ValidPassword(password, user.Salt, pwd)
 	if !flag {
 		c.JSON(http.StatusOK, gin.H{
+			"code":    -1,
 			"message": "密码不正确！",
+			"data":    data,
 		})
 		return
 	}
@@ -169,4 +191,39 @@ func Login(c *gin.Context) {
 		"data":    data,
 	})
 
+}
+
+// 防止跨域伪造请求
+var upGrade = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+func SendMsg(c *gin.Context) {
+	ws, err := upGrade.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer func(ws *websocket.Conn) {
+		err = ws.Close()
+	}(ws)
+	MsgHandler(ws, c)
+}
+
+func MsgHandler(ws *websocket.Conn, c *gin.Context) {
+	for {
+		msg, err := utils.Subscribe(c, utils.PublishKey)
+		if err != nil {
+			fmt.Println(err)
+		}
+		tm := time.Now().Format("2006-01-02 15:04:05")
+		m := fmt.Sprintf("[ws][%s]:%s", tm, msg)
+		err = ws.WriteMessage(1, []byte(m))
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
 }

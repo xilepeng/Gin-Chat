@@ -4,12 +4,13 @@ import (
 	"Gin-Chat/models"
 	"Gin-Chat/utils"
 	"fmt"
-	"github.com/asaskevich/govalidator"
-	"github.com/gorilla/websocket"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/websocket"
 
 	"github.com/gin-gonic/gin"
 )
@@ -226,4 +227,9 @@ func MsgHandler(ws *websocket.Conn, c *gin.Context) {
 			fmt.Println(err)
 		}
 	}
+}
+
+func SendUserMsg(c *gin.Context) {
+	models.Chat(c.Writer, c.Request)
+
 }

@@ -22,8 +22,22 @@ func TestGorm(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
+	err = db.AutoMigrate(&models.Message{})
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	db.AutoMigrate(&models.Contact{})
+	db.AutoMigrate(&models.GroupBasic{})
+
 	// Set table options
-	db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&models.UserBasic{})
+	err = db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&models.UserBasic{})
+	if err != nil {
+		return
+	}
+	err = db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&models.Message{})
+	if err != nil {
+		return
+	}
 
 	// 插入
 	//user := &models.UserBasic{Name: "mojo", PassWord: "0000", Salt: "klsdj23r"}

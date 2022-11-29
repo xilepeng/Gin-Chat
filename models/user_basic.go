@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 用户信息
 type UserBasic struct {
 	gorm.Model
 	Identity      string
